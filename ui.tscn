@@ -1,0 +1,51 @@
+[gd_scene load_steps=3 format=3 uid="uid://bo0r3xr3pammh"]
+
+[ext_resource type="Script" path="res://ui.gd" id="1_bb6j6"]
+
+[sub_resource type="Theme" id="Theme_uobhu"]
+
+[node name="Control" type="Control" node_paths=PackedStringArray("text_edit")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_bb6j6")
+text_edit = NodePath("TextEdit")
+
+[node name="HostButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 6.0
+offset_right = 543.0
+offset_bottom = 356.0
+text = "Host"
+
+[node name="JoinButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 551.0
+offset_top = 4.0
+offset_right = 1182.0
+offset_bottom = 357.0
+text = "Join
+"
+
+[node name="TextEdit" type="TextEdit" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.015
+anchor_top = 0.235
+anchor_right = 0.124
+anchor_bottom = 0.28
+offset_left = -10.28
+offset_top = 216.72
+offset_right = 407.152
+offset_bottom = 472.56
+theme = SubResource("Theme_uobhu")
+text = "Room Name
+"
+placeholder_text = "Room Name"
+
+[connection signal="pressed" from="HostButton" to="." method="_on_host_button_pressed"]
+[connection signal="pressed" from="JoinButton" to="." method="_on_join_button_pressed"]
