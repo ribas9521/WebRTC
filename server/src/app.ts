@@ -4,7 +4,7 @@ import { Peer, PeerStatus } from "./types/Peer";
 import { ClientMessageType, Message, ServerMessageType } from "./types/Message";
 import { Match } from "./types/Match";
 const PORT = 8080;
-const MAX_NUMBER_OF_PEERS_ON_MATCH = 3;
+const MAX_NUMBER_OF_PEERS_ON_MATCH = 2;
 
 const wss = new WebSocket.Server({ port: PORT });
 console.log("Server started at por: " + PORT);
@@ -29,6 +29,11 @@ wss.on("connection", (ws) => {
 
   ws.on("message", (message) => {
     parseMessage(peer, message.toString());
+  });
+
+  ws.on("close", () => {
+    console.log("Peer " + peer.id + " disconnected");
+    handleDisconnection(peer);
   });
 
   ws.send("Hello! Message From Server!!");
@@ -129,4 +134,36 @@ export const findMatch = () => {
 export const joinMatch = (peer: Peer, match: Match) => {
   match.players.push(peer.id);
   console.log("Peer " + peer.id + " joined match " + match.id);
+};
+
+export const leaveMatch = (peer: Peer): Match | null => {
+  const match = Array.from(Matches.values()).find((match) =>
+    match.players.includes(peer.id)
+  );
+  if (match) {
+    match.players = match.players.filter((id) => id !== peer.id);
+    console.log("Peer " + peer.id + " left match " + match.id);
+    if (match.players.length === 0) {
+      Matches.delete(match.id);
+      return null;
+    }
+    return match;
+  }
+  return null;
+};
+
+export const handleDisconnection = (peer: Peer) => {
+  const match = leaveMatch(peer);
+  if (!match) return;
+
+  match.players.forEach((playerId) => {
+    const player = Peers.get(playerId);
+    if (player) {
+      sendMessage(player, {
+        type: ServerMessageType.PEER_DISCONNECTED,
+        payload: { id: peer.id },
+        sourceId: 0,
+      });
+    }
+  });
 };

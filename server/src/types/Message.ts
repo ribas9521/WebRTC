@@ -16,4 +16,5 @@ export interface Message {
 export enum ServerMessageType {
   CONNECTED = "CONNECTED",
   START_MATCH = "START_MATCH",
+  PEER_DISCONNECTED = "PEER_DISCONNECTED",
 }

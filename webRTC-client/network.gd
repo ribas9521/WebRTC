@@ -8,7 +8,15 @@ var ws: WebSocketPeer = WebSocketPeer.new()
 var code = 1000
 var reason = "Unknown"
 
-const MessageTypes = {CONNECTED = "CONNECTED", START_MATCH = "START_MATCH", CANDIDATE="CANDIDATE", OFFER="OFFER", ANSWER="ANSWER", PEER_DISCONNECT= "PEER_DISCONNECT"}
+const MessageTypes = {
+	CONNECTED = "CONNECTED", 
+	START_MATCH = "START_MATCH", 
+	CANDIDATE="CANDIDATE", 
+	OFFER="OFFER", 
+	ANSWER="ANSWER", 
+	DISCONNECTED= "DISCONNECTED", 
+	PEER_DISCONNECTED = "PEER_DISCONNECTED"
+}
 
 func start(url, lobby = "", mesh:=true):
 	text_edit = get_tree().root.get_node("Control/TextEdit")
@@ -16,7 +24,6 @@ func start(url, lobby = "", mesh:=true):
 	connect_to_url(url)
 
 func stop():
-	_handle_disconnect()
 	multiplayer.multiplayer_peer = null
 	rtc_mp.close()
 	close()
@@ -90,6 +97,8 @@ func _parse_msgs():
 		_offer_received(src_id, msg.payload)
 	elif type == MessageTypes.ANSWER:
 		_answer_received(src_id, msg.payload)
+	elif type == MessageTypes.PEER_DISCONNECTED:
+		_peer_disconnected(msg.payload.id)
 	
 func _start_match(players):
 	for player in players:
@@ -159,6 +168,5 @@ func _check_webrtc_connection_state():
 	print("PEERS: ", peers)
 	
 func _handle_disconnect():
-	var id = rtc_mp.get_unique_id()
-	send_msg(MessageTypes.PEER_DISCONNECT, id)
+	stop()
 	
